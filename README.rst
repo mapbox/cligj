@@ -4,8 +4,8 @@ cligj
 .. image:: https://travis-ci.org/mapbox/cligj.svg
    :target: https://travis-ci.org/mapbox/cligj
 
-.. image:: https://coveralls.io/repos/mapbox/cligj/badge.png
-   :target: https://coveralls.io/r/mapbox/cligj
+.. image:: https://coveralls.io/repos/mapbox/cligj/badge.png?branch=master
+   :target: https://coveralls.io/r/mapbox/cligj?branch=master
 
 Common arguments and options for GeoJSON processing commands, using Click.
 
