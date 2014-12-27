@@ -12,8 +12,16 @@ Common arguments and options for GeoJSON processing commands, using Click.
 Example
 -------
 
-Here's an example of a command that writes out GeoJSON features as a
-collection or, optionally, a sequence of individual features.
+Here's an example of a command that writes out GeoJSON features as a collection
+or, optionally, a sequence of individual features. Since most software that
+reads and writes GeoJSON expects a text containing a single feature collection,
+that's the default, and a LF-delimited sequence of texts containing one GeoJSON
+feature each is a feature that is turned on using the ``--sequence`` option.
+To write sequences of feature texts that conform to the `JSON Text Sequences
+proposed standard
+<http://tools.ietf.org/html/draft-ietf-json-text-sequence-13>`__ (and might
+contain pretty-printed JSON) with the ASCII Record Separator (0x1e) as
+a delimiter, use the ``--rs`` option
 
 .. code-block:: python
 
@@ -51,3 +59,4 @@ On the command line it works like this.
     ^^{'type': 'Feature', 'id': '1'}
     ^^{'type': 'Feature', 'id': '2'}
 
+In this example, ``^^`` represents 0x1e.
