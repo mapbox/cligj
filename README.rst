@@ -12,6 +12,9 @@ Common arguments and options for GeoJSON processing commands, using Click.
 Example
 -------
 
+Here's an example of a command that writes out GeoJSON features as a
+collection or, optionally, a sequence of individual features.
+
 .. code-block:: python
 
     import click
@@ -33,12 +36,17 @@ Example
             click.echo(json.dumps(
                 {'type': 'FeatureCollection', 'features': features}))
 
-On the command line:
+On the command line it works like this.
 
 .. code-block:: console
 
     $ features
     {'type': 'FeatureCollection', 'features': [{'type': 'Feature', 'id': '1'}, {'type': 'Feature', 'id': '2'}]}
+
+    $ features --sequence
+    {'type': 'Feature', 'id': '1'}
+    {'type': 'Feature', 'id': '2'}
+
     $ features --sequence --rs
     ^^{'type': 'Feature', 'id': '1'}
     ^^{'type': 'Feature', 'id': '2'}
