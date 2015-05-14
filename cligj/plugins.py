@@ -94,6 +94,8 @@ class BrokenCommand(click.Command):
             Name of command.
         """
 
+        util_name = os.path.basename(sys.argv and sys.argv[0] or __file__)
+
         click.Command.__init__(self, name)
         self.help = (
             "Warning: entry point could not be loaded. Contact "
@@ -101,7 +103,7 @@ class BrokenCommand(click.Command):
             + traceback.format_exc())
         self.short_help = (
             "Warning: could not load plugin. See `%s %s --help`."
-            % (sys.argv and sys.argv[0] or __file__, self.name))
+            % (util_name, self.name))
 
     def invoke(self, ctx):
 
