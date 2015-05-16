@@ -1,6 +1,7 @@
 """Unittests for ``cligj.plugins``."""
 
 
+import os
 from pkg_resources import EntryPoint
 from pkg_resources import iter_entry_points
 from pkg_resources import working_set
@@ -13,7 +14,7 @@ import cligj.plugins
 # Create a few CLI commands for testing
 @click.command()
 @click.argument('arg')
-def printer(arg):
+def cmd1(arg):
 
     """
     Printit!
@@ -23,7 +24,7 @@ def printer(arg):
 
 @click.command()
 @click.argument('arg')
-def square(arg):
+def cmd2(arg):
 
     """
     Square it!
@@ -47,10 +48,10 @@ class DistStub(object):
 
 working_set.by_key['cligj']._ep_map = {
     'cligj.test_plugins': {
-        'printer': EntryPoint.parse(
-            'printer=tests.test_plugins:printer', dist=DistStub()),
-        'square': EntryPoint.parse(
-            'square=tests.test_plugins:square', dist=DistStub())
+        'cmd1': EntryPoint.parse(
+            'cmd1=tests.test_plugins:cmd1', dist=DistStub()),
+        'cmd2': EntryPoint.parse(
+            'cmd2=tests.test_plugins:cmd2', dist=DistStub())
     },
     'cligj.broken_plugins': {
         'before': EntryPoint.parse(
@@ -63,18 +64,62 @@ working_set.by_key['cligj']._ep_map = {
 }
 
 
+# Main CLI groups - one with good plugins attached and the other broken
+@cligj.plugins.group(plugins=iter_entry_points('cligj.test_plugins'))
+def good_cli():
+    pass
+
+@cligj.plugins.group(plugins=iter_entry_points('cligj.broken_plugins'))
+def broken_cli():
+    pass
+
+
 def test_register_and_run(runner):
 
-    @cligj.plugins.group(plugins=iter_entry_points('cligj.test_plugins'))
-    def cli():
-        pass
-
-    # Execute without any calling a sub-command to get the help message
-    result = runner.invoke(cli)
+    result = runner.invoke(good_cli)
     assert result.exit_code is 0
 
-    # Execute each subcommand
     for ep in iter_entry_points('cligj.test_plugins'):
-        cmd_result = runner.invoke(cli, [ep.name, 'something'])
+        cmd_result = runner.invoke(good_cli, [ep.name, 'something'])
         assert cmd_result.exit_code is 0
         assert cmd_result.output.strip() == 'passed'
+
+
+def test_broken_register_and_run(runner):
+
+    result = runner.invoke(broken_cli)
+    assert result.exit_code is 0
+    assert u'\U0001F4A9' in result.output or u'\u2020' in result.output
+
+    for ep in iter_entry_points('cligj.broken_plugins'):
+        cmd_result = runner.invoke(broken_cli, [ep.name])
+        assert cmd_result.exit_code is not 0
+        assert 'Traceback' in cmd_result.output
+
+
+def test_group_chain(runner):
+
+    # Attach a sub-group to a CLI and get execute it without arguments to make
+    # sure both the sub-group and all the parent group's commands are present
+    @good_cli.group()
+    def sub_cli():
+        pass
+    result = runner.invoke(good_cli)
+    assert result.exit_code is 0
+    assert sub_cli.name in result.output
+    for ep in iter_entry_points('cligj.test_plugins'):
+        assert ep.name in result.output
+
+    # Same as above but the sub-group has plugins
+    @good_cli.group(plugins=iter_entry_points('cligj.test_plugins'))
+    def sub_cli_plugins():
+        pass
+    result = runner.invoke(good_cli, ['sub_cli_plugins'])
+    assert result.exit_code is 0
+    for ep in iter_entry_points('cligj.test_plugins'):
+        assert ep.name in result.output
+    
+    # Execute one of the sub-group's commands
+    result = runner.invoke(good_cli, ['sub_cli_plugins', 'cmd1', 'something'])
+    assert result.exit_code is 0
+    assert result.output.strip() == 'passed'
