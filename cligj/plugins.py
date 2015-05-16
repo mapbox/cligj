@@ -94,15 +94,21 @@ class BrokenCommand(click.Command):
             Name of command.
         """
 
+        click.Command.__init__(self, name)
+
         util_name = os.path.basename(sys.argv and sys.argv[0] or __file__)
 
-        click.Command.__init__(self, name)
+        if os.environ.get('CLIGJ_HONESTLY'):  # pragma no cover
+            icon = u'\U0001F4A9'
+        else:
+            icon = u'\u2020'
+
         self.help = (
-            "Warning: entry point could not be loaded. Contact "
+            "\nWarning: entry point could not be loaded. Contact "
             "its author for help.\n\n\b\n"
             + traceback.format_exc())
         self.short_help = (
-            "Warning: could not load plugin. See `%s %s --help`."
+            icon + " Warning: could not load plugin. See `%s %s --help`."
             % (util_name, self.name))
 
     def invoke(self, ctx):
@@ -117,7 +123,7 @@ class BrokenCommand(click.Command):
         """
 
         click.echo(self.help, color=ctx.color)
-        ctx.exit()
+        ctx.exit(1)  # Defaults to 0 but we want an error code
 
 
 class Group(click.Group):
@@ -195,11 +201,7 @@ def group(plugins=None, **kwargs):
                     # Catch this so a busted plugin doesn't take down the CLI.
                     # Handled by registering a dummy command that does nothing
                     # other than explain the error.
-                    if os.environ.get('CLIGJ_HONESTLY'):
-                        broken_name = entry_point.name + u'\U0001F4A9'
-                    else:
-                        broken_name = entry_point.name + u'\u2020'
-                    grp.add_command(BrokenCommand(broken_name))
+                    grp.add_command(BrokenCommand(entry_point.name))
         return grp
 
     return decorator
