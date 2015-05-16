@@ -154,8 +154,18 @@ class Group(click.Group):
 def group(plugins=None, **kwargs):
 
     """
-    A special group decorator that behaves exactly like `click.group()` except
-    that plugins structured as setuptools entry points optionally be loaded first.
+    A special group decorator that behaves exactly like `click.group()` but
+    allows for additional plugins to be loaded.
+
+    Example:
+
+        >>> import cligj.plugins
+        >>> from pkg_resources import iter_entry_points
+        >>> plugins = iter_entry_points('module.entry_points')
+        >>> @cligj.plugins.group(plugins=plugins)
+        ... def cli():
+        ...    '''A CLI aplication'''
+        ...    pass
 
     Plugins that raise an exception on load are caught and converted to an
     instance of `BrokenCommand()`, which has better error handling and prevents
@@ -165,6 +175,8 @@ def group(plugins=None, **kwargs):
 
     Parameters
     ----------
+    plugins : iter
+        An iterable that produces one entry point per iteration.
     kwargs : **kwargs
         Additional arguments for `click.Group()`.
     """
