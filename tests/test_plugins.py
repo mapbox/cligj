@@ -15,21 +15,13 @@ import cligj.plugins
 @click.command()
 @click.argument('arg')
 def cmd1(arg):
-
-    """
-    Printit!
-    """
-
+    """Test command 1"""
     click.echo('passed')
 
 @click.command()
 @click.argument('arg')
 def cmd2(arg):
-
-    """
-    Square it!
-    """
-
+    """Test command 2"""
     click.echo('passed')
 
 
@@ -67,11 +59,21 @@ working_set.by_key['cligj']._ep_map = {
 # Main CLI groups - one with good plugins attached and the other broken
 @cligj.plugins.group(plugins=iter_entry_points('cligj.test_plugins'))
 def good_cli():
+    """Good CLI group."""
     pass
+
 
 @cligj.plugins.group(plugins=iter_entry_points('cligj.broken_plugins'))
 def broken_cli():
+    """Broken CLI group."""
     pass
+
+
+def test_registered():
+    # Make sure the plugins are properly registered.  If this test fails it
+    # means that some of the for loops in other tests may not be executing.
+    assert len([ep for ep in iter_entry_points('cligj.test_plugins')]) > 1
+    assert len([ep for ep in iter_entry_points('cligj.broken_plugins')]) > 1
 
 
 def test_register_and_run(runner):
@@ -103,7 +105,9 @@ def test_group_chain(runner):
     # sure both the sub-group and all the parent group's commands are present
     @good_cli.group()
     def sub_cli():
+        """Sub CLI."""
         pass
+
     result = runner.invoke(good_cli)
     assert result.exit_code is 0
     assert sub_cli.name in result.output
@@ -113,12 +117,14 @@ def test_group_chain(runner):
     # Same as above but the sub-group has plugins
     @good_cli.group(plugins=iter_entry_points('cligj.test_plugins'))
     def sub_cli_plugins():
+        """Sub CLI with plugins."""
         pass
+
     result = runner.invoke(good_cli, ['sub_cli_plugins'])
     assert result.exit_code is 0
     for ep in iter_entry_points('cligj.test_plugins'):
         assert ep.name in result.output
-    
+
     # Execute one of the sub-group's commands
     result = runner.invoke(good_cli, ['sub_cli_plugins', 'cmd1', 'something'])
     assert result.exit_code is 0
