@@ -33,7 +33,9 @@ def cmd2(arg):
 # which calls `dist.requires()` and the `cligj.plugins.group()` decorator
 # doesn't allow us to change this.  Because we are manually registering these
 # plugins the `dist` attribute is `None` so we can just create a stub that
-# always returns an empty list since we don't have any requirements.
+# always returns an empty list since we don't have any requirements.  A full
+# `pkg_resources.Distribution()` instance is not needed because there isn't
+# a package installed anywhere.
 class DistStub(object):
     def requires(self, *args):
         return []
