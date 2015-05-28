@@ -8,15 +8,15 @@ with codecs_open('README.rst', encoding='utf-8') as f:
 
 
 setup(name='cligj',
-      version='0.1.0',
-      description=u"Click params for GeoJSON CLI",
+      version='0.2.0',
+      description=u"Click params for commmand line interfaces to GeoJSON",
       long_description=long_description,
       classifiers=[],
       keywords='',
       author=u"Sean Gillies",
       author_email='sean@mapbox.com',
       url='https://github.com/mapbox/cligj',
-      license='MIT',
+      license='BSD',
       packages=find_packages(exclude=['ez_setup', 'examples', 'tests']),
       include_package_data=True,
       zip_safe=False,

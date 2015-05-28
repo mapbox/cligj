@@ -1,0 +1,9 @@
+0.2.0 (2015-05-28)
+------------------
+- Addition of a pluggable command group class and a corresponding click-style
+  decorator (#2, #3).
+
+0.1.0 (2015-01-06)
+------------------
+- Initial release: a collection of GeoJSON-related command line arguments and
+  options for use with Click (#1).
