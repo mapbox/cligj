@@ -65,6 +65,8 @@ In this example, ``^^`` represents 0x1e.
 Plugins
 -------
 
+**DEPRECATED:** Use `click-plugins <https://github.com/click-contrib/click-plugins>`_ instead.
+
 ``cligj`` can also facilitate loading external `click-based <http://click.pocoo.org/4/>`_
 plugins via `setuptools entry points <https://pythonhosted.org/setuptools/setuptools.html#dynamic-discovery-of-services-and-plugins>`_.
 The ``cligj.plugins`` module contains a special ``group()`` decorator that behaves exactly like
