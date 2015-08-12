@@ -65,7 +65,8 @@ In this example, ``^^`` represents 0x1e.
 Plugins
 -------
 
-.. warning:: DEPRECATED
+.. warning::
+   The cligj.plugins module is deprecated and will be removed at version 1.0.
    Use `click-plugins <https://github.com/click-contrib/click-plugins>`_
    instead.
 
