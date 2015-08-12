@@ -21,7 +21,7 @@ setup(name='cligj',
       include_package_data=True,
       zip_safe=False,
       install_requires=[
-          'click>=3.0'
+          'click>=4.0'
       ],
       extras_require={
           'test': ['pytest'],

@@ -76,7 +76,8 @@ import click
 
 warnings.warn(
     "cligj.plugins has been deprecated in favor of click-plugins: "
-    "https://github.com/click-contrib/click-plugins",
+    "https://github.com/click-contrib/click-plugins. The plugins "
+    "module will be removed in cligj 1.0.",
     FutureWarning, stacklevel=2)
 
 
