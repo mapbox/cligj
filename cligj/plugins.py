@@ -69,8 +69,15 @@ the command or use `--help`.
 import os
 import sys
 import traceback
+import warnings
 
 import click
+
+
+warnings.warn(
+    "cligj.plugins has been deprecated in favor of click-plugins: "
+    "https://github.com/click-contrib/click-plugins",
+    FutureWarning, stacklevel=2)
 
 
 class BrokenCommand(click.Command):
