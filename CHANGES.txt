@@ -1,3 +1,9 @@
+0.3.0 (2015-08-12)
+------------------
+- Deprecation of the cligj.plugins module (#6). Please switch to the 
+  click-plugins module: https://github.com/click-contrib/click-plugins. The
+  cligj.plugins module will be removed from cligj at version 1.0.
+
 0.2.0 (2015-05-28)
 ------------------
 - Addition of a pluggable command group class and a corresponding click-style
