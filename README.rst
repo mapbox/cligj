@@ -39,19 +39,25 @@ a delimiter, use the ``--rs`` option
     import cligj
     import json
 
+    def process_features(features)
+        for feature in features
+            # TODO process feature here
+            yield feature
+
     @click.command()
     @cligj.features_in_arg
     @cligj.sequence_opt
     @cligj.use_rs_opt
     def pass_features(features, sequence, use_rs):
         if sequence:
-            for feature in features:
+            for feature in process_features(features):
                 if use_rs:
                     click.echo(b'\x1e', nl=False)
                 click.echo(json.dumps(feature))
         else:
             click.echo(json.dumps(
-                {'type': 'FeatureCollection', 'features': list(features)}))
+                {'type': 'FeatureCollection',
+                 'features': list(process_features(features))}))
 
 On the command line it works like this.
 
