@@ -6,6 +6,11 @@ import click
 
 
 def normalize_feature_inputs(ctx, param, features_like):
+    """ Click callback which accepts the following values for features_like
+        [] == stdin
+        ["path", "path2.geojson"] == file paths
+        ["...", "..."] == or coords or geojson
+    """
     if len(features_like) == 0:
         features_like = ('-',)
 
@@ -83,8 +88,12 @@ def coords_from_query(query):
 
 
 def normalize_feature_objects(feature_objs):
+    """Takes an iterable of GeoJSON-like Feature mappings or
+    an iterable of objects with a geo interface and
+    normalizes it to the former."""
     for obj in feature_objs:
         if hasattr(obj, "__geo_interface__") and \
+           'type' in obj.__geo_interface__.keys() and \
            obj.__geo_interface__['type'] == 'Feature':
             yield obj.__geo_interface__
         elif isinstance(obj, dict) and 'type' in obj and \
