@@ -9,11 +9,12 @@ cligj
 
 Common arguments and options for GeoJSON processing commands, using Click.
 
-TODO what it does and who it is for
+`cligj` is for Python developers who create command line interfaces for geospatial data.
+`cligj` allows you to quickly build consistent, well-tested and interoperable CLIs for handling GeoJSON. 
+
 
 Arguments
 ---------
-
 
 ``files_in_arg``
 Multiple files
@@ -27,6 +28,7 @@ and returns the input data as an iterable of GeoJSON Feature-like dictionaries
 
 Options
 --------
+
 ``verbose_opt``
 
 ``quiet_opt``
@@ -87,7 +89,7 @@ a delimiter, use the ``--rs`` option
     import json
 
     def process_features(features):
-        for feature in features
+        for feature in features:
             # TODO process feature here
             yield feature
 
@@ -106,7 +108,25 @@ a delimiter, use the ``--rs`` option
                 {'type': 'FeatureCollection',
                  'features': list(process_features(features))}))
 
-On the command line it works like this.
+On the command line, the generated help text explains the usage
+
+.. code-block:: console
+
+    Usage: pass_features [OPTIONS] FEATURES...
+
+    Options:
+    --sequence / --no-sequence  Write a LF-delimited sequence of texts
+                                containing individual objects or write a single
+                                JSON text containing a feature collection object
+                                (the default).
+    --rs / --no-rs              Use RS (0x1E) as a prefix for individual texts
+                                in a sequence as per http://tools.ietf.org/html
+                                /draft-ietf-json-text-sequence-13 (default is
+                                False).
+    --help                      Show this message and exit.
+
+
+And can be used like this
 
 .. code-block:: console
 
