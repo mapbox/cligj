@@ -28,28 +28,42 @@ and returns the input data as an iterable of GeoJSON Feature-like dictionaries
 Options
 --------
 ``verbose_opt``
+
 ``quiet_opt``
+
 ``format_opt``
 
-JSON formatting options.
+JSON formatting options
+~~~~~~~~~~~~~~~~~~~~~~~
+
 ``indent_opt``
+
 ``compact_opt``
 
-Coordinate precision option.
+Coordinate precision option
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ``precision_opt``
 
-Geographic (default), projected, or Mercator switch.
+Geographic (default), projected, or Mercator switch
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ``projection_geographic_opt``
+
 ``projection_projected_opt``
+
 ``projection_mercator_opt``
 
-Feature collection or feature sequence switch.
+Feature collection or feature sequence switch
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ``sequence_opt``
+
 ``use_rs_opt``
 
-GeoJSON output mode option.
+GeoJSON output mode option
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 ``geojson_type_collection_opt``
+
 ``geojson_type_feature_opt``
+
 ``def geojson_type_bbox_opt``
 
 Example
