@@ -118,9 +118,9 @@ def test_normalize_feature_objects(expected_features):
     assert expected_features == list(normalize_feature_objects(objs))
     assert expected_features == list(normalize_feature_objects(expected_features))
 
+
 def test_normalize_feature_objects_bad(expected_features):
     objs = [MockGeo(f) for f in expected_features]
     objs.append(MockGeo(dict()))
     with pytest.raises(ValueError):
         list(normalize_feature_objects(objs))
-

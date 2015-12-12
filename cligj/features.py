@@ -6,10 +6,14 @@ import click
 
 
 def normalize_feature_inputs(ctx, param, features_like):
-    """ Click callback which accepts the following values for features_like
-        [] == stdin
-        ["path", "path2.geojson"] == file paths
-        ["...", "..."] == or coords or geojson
+    """ Click callback which accepts the following values:
+    * Path to file(s), each containing single FeatureCollection or Feature
+    * Coordinate pair(s) of the form "[0, 0]" or "0, 0" or "0 0"
+    * if not specified or '-', process STDIN stream containing
+        - line-delimited features
+        - ASCII Record Separator (0x1e) delimited features
+        - FeatureCollection or Feature object
+    and yields GeoJSON Features.
     """
     if len(features_like) == 0:
         features_like = ('-',)

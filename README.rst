@@ -13,11 +13,44 @@ TODO what it does and who it is for
 
 Arguments
 ---------
-TODO
+
+
+``files_in_arg``
+Multiple files
+
+``files_inout_arg``
+Multiple files, last of which is an output file.
+
+``features_in_arg``
+GeoJSON Features input which accepts multiple representations of GeoJSON features
+and returns the input data as an iterable of GeoJSON Feature-like dictionaries
 
 Options
 --------
-TODO
+``verbose_opt``
+``quiet_opt``
+``format_opt``
+
+JSON formatting options.
+``indent_opt``
+``compact_opt``
+
+Coordinate precision option.
+``precision_opt``
+
+Geographic (default), projected, or Mercator switch.
+``projection_geographic_opt``
+``projection_projected_opt``
+``projection_mercator_opt``
+
+Feature collection or feature sequence switch.
+``sequence_opt``
+``use_rs_opt``
+
+GeoJSON output mode option.
+``geojson_type_collection_opt``
+``geojson_type_feature_opt``
+``def geojson_type_bbox_opt``
 
 Example
 -------
@@ -39,7 +72,7 @@ a delimiter, use the ``--rs`` option
     import cligj
     import json
 
-    def process_features(features)
+    def process_features(features):
         for feature in features
             # TODO process feature here
             yield feature
