@@ -9,6 +9,16 @@ cligj
 
 Common arguments and options for GeoJSON processing commands, using Click.
 
+TODO what it does and who it is for
+
+Arguments
+---------
+TODO
+
+Options
+--------
+TODO
+
 Example
 -------
 
@@ -30,11 +40,10 @@ a delimiter, use the ``--rs`` option
     import json
 
     @click.command()
+    @cligj.features_in_arg
     @cligj.sequence_opt
     @cligj.use_rs_opt
-    def features(sequence, use_rs):
-        features = [
-            {'type': 'Feature', 'id': '1'}, {'type': 'Feature', 'id': '2'}]
+    def pass_features(features, sequence, use_rs):
         if sequence:
             for feature in features:
                 if use_rs:
@@ -42,20 +51,26 @@ a delimiter, use the ``--rs`` option
                 click.echo(json.dumps(feature))
         else:
             click.echo(json.dumps(
-                {'type': 'FeatureCollection', 'features': features}))
+                {'type': 'FeatureCollection', 'features': list(features)}))
 
 On the command line it works like this.
 
 .. code-block:: console
 
-    $ features
+    $ cat data.geojson
     {'type': 'FeatureCollection', 'features': [{'type': 'Feature', 'id': '1'}, {'type': 'Feature', 'id': '2'}]}
 
-    $ features --sequence
+    $ pass_features data.geojson
+    {'type': 'FeatureCollection', 'features': [{'type': 'Feature', 'id': '1'}, {'type': 'Feature', 'id': '2'}]}
+
+    $ cat data.geojson | pass_features
+    {'type': 'FeatureCollection', 'features': [{'type': 'Feature', 'id': '1'}, {'type': 'Feature', 'id': '2'}]}
+
+    $ cat data.geojson | pass_features --sequence
     {'type': 'Feature', 'id': '1'}
     {'type': 'Feature', 'id': '2'}
 
-    $ features --sequence --rs
+    $ cat data.geojson | pass_features --sequence --rs
     ^^{'type': 'Feature', 'id': '1'}
     ^^{'type': 'Feature', 'id': '2'}
 
@@ -69,38 +84,3 @@ Plugins
    The cligj.plugins module is deprecated and will be removed at version 1.0.
    Use `click-plugins <https://github.com/click-contrib/click-plugins>`_
    instead.
-
-``cligj`` can also facilitate loading external `click-based
-<http://click.pocoo.org/4/>`_ plugins via `setuptools entry points
-<https://pythonhosted.org/setuptools/setuptools.html#dynamic-discovery-of-services-and-plugins>`_.
-The ``cligj.plugins`` module contains a special ``group()`` decorator that
-behaves exactly like ``click.group()`` except that it offers the opportunity
-load plugins and attach them to the group as it is istantiated.
-
-.. code-block:: python
-
-    from pkg_resources import iter_entry_points
-
-    import cligj.plugins
-    import click
-
-    @cligj.plugins.group(plugins=iter_entry_points('module.entry_points'))
-    def cli():
-
-        """A CLI application."""
-
-        pass
-
-    @cli.command()
-    @click.argument('arg')
-    def printer(arg):
-
-        """Print arg."""
-
-        click.echo(arg)
-
-    @cli.group(plugins=iter_entry_points('other_module.more_plugins'))
-    def plugins():
-
-        """A sub-group that contains plugins from a different module."""
-        pass
