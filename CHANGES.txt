@@ -1,3 +1,9 @@
+0.4.0 (2015-12-17)
+------------------
+- Introduces a click argument, `features_in_arg`, which utilizes a click
+  callback to normalize the input of geojson features (#9).
+- Release from tagged Travis CI builds (#10).
+
 0.3.0 (2015-08-12)
 ------------------
 - Deprecation of the cligj.plugins module (#6). Please switch to the 
