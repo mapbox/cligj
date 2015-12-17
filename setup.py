@@ -8,7 +8,7 @@ with codecs_open('README.rst', encoding='utf-8') as f:
 
 
 setup(name='cligj',
-      version='0.3.0',
+      version='0.4.0',
       description=u"Click params for commmand line interfaces to GeoJSON",
       long_description=long_description,
       classifiers=[],
@@ -24,5 +24,5 @@ setup(name='cligj',
           'click>=4.0'
       ],
       extras_require={
-          'test': ['pytest'],
+          'test': ['pytest-cov'],
       })
