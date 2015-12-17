@@ -4,6 +4,8 @@
 
 import click
 
+from .features import normalize_feature_inputs
+
 # Arguments.
 
 # Multiple input files.
@@ -22,8 +24,17 @@ files_inout_arg = click.argument(
     required=True,
     metavar="INPUTS... OUTPUT")
 
-# Options.
+# Features input
+# Accepts multiple representations of GeoJSON features
+# Returns the input data as an iterable of GeoJSON Feature-like dictionaries
+features_in_arg = click.argument(
+    'features',
+    nargs=-1,
+    callback=normalize_feature_inputs,
+    metavar="FEATURES...")
 
+
+# Options.
 verbose_opt = click.option(
     '--verbose', '-v',
     count=True,

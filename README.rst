@@ -9,6 +9,65 @@ cligj
 
 Common arguments and options for GeoJSON processing commands, using Click.
 
+`cligj` is for Python developers who create command line interfaces for geospatial data.
+`cligj` allows you to quickly build consistent, well-tested and interoperable CLIs for handling GeoJSON. 
+
+
+Arguments
+---------
+
+``files_in_arg``
+Multiple files
+
+``files_inout_arg``
+Multiple files, last of which is an output file.
+
+``features_in_arg``
+GeoJSON Features input which accepts multiple representations of GeoJSON features
+and returns the input data as an iterable of GeoJSON Feature-like dictionaries
+
+Options
+--------
+
+``verbose_opt``
+
+``quiet_opt``
+
+``format_opt``
+
+JSON formatting options
+~~~~~~~~~~~~~~~~~~~~~~~
+
+``indent_opt``
+
+``compact_opt``
+
+Coordinate precision option
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``precision_opt``
+
+Geographic (default), projected, or Mercator switch
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``projection_geographic_opt``
+
+``projection_projected_opt``
+
+``projection_mercator_opt``
+
+Feature collection or feature sequence switch
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``sequence_opt``
+
+``use_rs_opt``
+
+GeoJSON output mode option
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+``geojson_type_collection_opt``
+
+``geojson_type_feature_opt``
+
+``def geojson_type_bbox_opt``
+
 Example
 -------
 
@@ -29,33 +88,62 @@ a delimiter, use the ``--rs`` option
     import cligj
     import json
 
+    def process_features(features):
+        for feature in features:
+            # TODO process feature here
+            yield feature
+
     @click.command()
+    @cligj.features_in_arg
     @cligj.sequence_opt
     @cligj.use_rs_opt
-    def features(sequence, use_rs):
-        features = [
-            {'type': 'Feature', 'id': '1'}, {'type': 'Feature', 'id': '2'}]
+    def pass_features(features, sequence, use_rs):
         if sequence:
-            for feature in features:
+            for feature in process_features(features):
                 if use_rs:
                     click.echo(b'\x1e', nl=False)
                 click.echo(json.dumps(feature))
         else:
             click.echo(json.dumps(
-                {'type': 'FeatureCollection', 'features': features}))
+                {'type': 'FeatureCollection',
+                 'features': list(process_features(features))}))
 
-On the command line it works like this.
+On the command line, the generated help text explains the usage
 
 .. code-block:: console
 
-    $ features
+    Usage: pass_features [OPTIONS] FEATURES...
+
+    Options:
+    --sequence / --no-sequence  Write a LF-delimited sequence of texts
+                                containing individual objects or write a single
+                                JSON text containing a feature collection object
+                                (the default).
+    --rs / --no-rs              Use RS (0x1E) as a prefix for individual texts
+                                in a sequence as per http://tools.ietf.org/html
+                                /draft-ietf-json-text-sequence-13 (default is
+                                False).
+    --help                      Show this message and exit.
+
+
+And can be used like this
+
+.. code-block:: console
+
+    $ cat data.geojson
     {'type': 'FeatureCollection', 'features': [{'type': 'Feature', 'id': '1'}, {'type': 'Feature', 'id': '2'}]}
 
-    $ features --sequence
+    $ pass_features data.geojson
+    {'type': 'FeatureCollection', 'features': [{'type': 'Feature', 'id': '1'}, {'type': 'Feature', 'id': '2'}]}
+
+    $ cat data.geojson | pass_features
+    {'type': 'FeatureCollection', 'features': [{'type': 'Feature', 'id': '1'}, {'type': 'Feature', 'id': '2'}]}
+
+    $ cat data.geojson | pass_features --sequence
     {'type': 'Feature', 'id': '1'}
     {'type': 'Feature', 'id': '2'}
 
-    $ features --sequence --rs
+    $ cat data.geojson | pass_features --sequence --rs
     ^^{'type': 'Feature', 'id': '1'}
     ^^{'type': 'Feature', 'id': '2'}
 
@@ -69,38 +157,3 @@ Plugins
    The cligj.plugins module is deprecated and will be removed at version 1.0.
    Use `click-plugins <https://github.com/click-contrib/click-plugins>`_
    instead.
-
-``cligj`` can also facilitate loading external `click-based
-<http://click.pocoo.org/4/>`_ plugins via `setuptools entry points
-<https://pythonhosted.org/setuptools/setuptools.html#dynamic-discovery-of-services-and-plugins>`_.
-The ``cligj.plugins`` module contains a special ``group()`` decorator that
-behaves exactly like ``click.group()`` except that it offers the opportunity
-load plugins and attach them to the group as it is istantiated.
-
-.. code-block:: python
-
-    from pkg_resources import iter_entry_points
-
-    import cligj.plugins
-    import click
-
-    @cligj.plugins.group(plugins=iter_entry_points('module.entry_points'))
-    def cli():
-
-        """A CLI application."""
-
-        pass
-
-    @cli.command()
-    @click.argument('arg')
-    def printer(arg):
-
-        """Print arg."""
-
-        click.echo(arg)
-
-    @cli.group(plugins=iter_entry_points('other_module.more_plugins'))
-    def plugins():
-
-        """A sub-group that contains plugins from a different module."""
-        pass
