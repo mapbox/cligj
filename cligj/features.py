@@ -92,7 +92,7 @@ def to_feature(obj):
 
 
 def is_geometry(obj):
-    """Test if object is a geojson geomery
+    """Test if object is a geojson geometry
     """
     if 'coordinates' in obj.keys():
         return True
