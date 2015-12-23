@@ -56,20 +56,49 @@ def iter_features(src):
             yield feat
     else:
         try:
+            # Process each line as GeoJSON object
             feat = json.loads(first_line)
-            assert feat['type'] == 'Feature'
-            yield feat
+            if not (feat['type'] == 'Feature' or is_geometry(feat)):
+                raise AssertionError("Not a feature or geometry")
+            yield to_feature(feat)
             for line in src:
                 feat = json.loads(line)
-                yield feat
+                yield to_feature(feat)
         except (TypeError, KeyError, AssertionError, ValueError):
+            # Process entire stream as a single GeoJSON object
             text = "".join(chain([first_line], src))
             feats = json.loads(text)
-            if feats['type'] == 'Feature':
-                yield feats
+            if feats['type'] == 'Feature' or is_geometry(feats):
+                yield to_feature(feats)
             elif feats['type'] == 'FeatureCollection':
                 for feat in feats['features']:
                     yield feat
+
+
+def to_feature(obj):
+    """Takes a feature or a geometry
+    returns feature verbatim or
+    wraps geom in a feature with empty properties
+    """
+    if obj['type'] == 'Feature':
+        return obj
+    elif is_geometry(obj):
+        return {
+            'type': 'Feature',
+            'properties': {},
+            'geometry': obj}
+    else:
+        raise ValueError("Object is not a feature or geometry")
+
+
+def is_geometry(obj):
+    """Test if object is a geojson geomery
+    """
+    if 'coordinates' in obj.keys():
+        return True
+    else:
+        return False
+
 
 def iter_query(query):
     """Accept a filename, stream, or string.
