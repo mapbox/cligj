@@ -108,6 +108,11 @@ def test_coordpairs_space(expected_features):
     assert _geoms(features) == _geoms(expected_features)
 
 
+def test_geometrysequence(expected_features):
+    features = normalize_feature_inputs(None, 'features', ["tests/twopoints_geom_seq.txt"])
+    assert _geoms(features) == _geoms(expected_features)
+
+
 class MockGeo(object):
     def __init__(self, feature):
         self.__geo_interface__ = feature
