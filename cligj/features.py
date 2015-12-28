@@ -36,48 +36,52 @@ def normalize_feature_inputs(ctx, param, features_like):
             yield feature
 
 
-def iter_features(src, transformer=None):
-    """Yield features from a src that may be either a GeoJSON feature
-    text sequence or GeoJSON feature collection."""
-    if transformer is None:
-        transformer = lambda x: x
-    first_line = next(src)
+def iter_features(geojsonfile, func=None):
+    """Extract GeoJSON features from a GeoJSON file object.
+
+    Given a file-like object containing a single GeoJSON feature
+    collection text or a sequence of GeoJSON, iter_features() iterates
+    over lines of the file and yields GeoJSON features.
+
+    Parameters
+    ----------
+    geojsonfile: a file-like object
+        The geojsonfile implements the iterator protocol and yields
+        lines of JSON text.
+    func: function, optional
+        A function that will be applied to each extracted feature. It
+        takes a feature object and returns a replacement feature.
+    """
+    func = func or (lambda x: x)
+    first_line = next(geojsonfile)
+
     # If input is RS-delimited JSON sequence.
     if first_line.startswith(u'\x1e'):
-        buffer = first_line.strip(u'\x1e')
-        for line in src:
+        text_buffer = first_line.strip(u'\x1e')
+        for line in geojsonfile:
             if line.startswith(u'\x1e'):
-                if buffer:
-                    feat = json.loads(buffer)
-                    feat['geometry'] = transformer(feat['geometry'])
-                    yield feat
-                buffer = line.strip(u'\x1e')
+                if text_buffer:
+                    yield func(json.loads(text_buffer))
+                text_buffer = line.strip(u'\x1e')
             else:
-                buffer += line
+                text_buffer += line
         else:
-            feat = json.loads(buffer)
-            feat['geometry'] = transformer(feat['geometry'])
-            yield feat
+            yield func(json.loads(text_buffer))
     else:
         try:
             feat = json.loads(first_line)
             assert feat['type'] == 'Feature'
-            feat['geometry'] = transformer(feat['geometry'])
-            yield feat
-            for line in src:
-                feat = json.loads(line)
-                feat['geometry'] = transformer(feat['geometry'])
-                yield feat
+            yield func(feat)
+            for line in geojsonfile:
+                yield func(json.loads(line))
         except (TypeError, KeyError, AssertionError, ValueError):
-            text = "".join(chain([first_line], src))
+            text = "".join(chain([first_line], geojsonfile))
             feats = json.loads(text)
             if feats['type'] == 'Feature':
-                feats['geometry'] = transformer(feats['geometry'])
-                yield feats
+                yield func(feats)
             elif feats['type'] == 'FeatureCollection':
                 for feat in feats['features']:
-                    feat['geometry'] = transformer(feat['geometry'])
-                    yield feat
+                    yield func(feat)
 
 
 def iter_query(query):
