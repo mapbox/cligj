@@ -36,9 +36,11 @@ def normalize_feature_inputs(ctx, param, features_like):
             yield feature
 
 
-def iter_features(src):
+def iter_features(src, transformer=None):
     """Yield features from a src that may be either a GeoJSON feature
     text sequence or GeoJSON feature collection."""
+    if transformer is None:
+        transformer = lambda x: x
     first_line = next(src)
     # If input is RS-delimited JSON sequence.
     if first_line.startswith(u'\x1e'):
@@ -47,29 +49,36 @@ def iter_features(src):
             if line.startswith(u'\x1e'):
                 if buffer:
                     feat = json.loads(buffer)
+                    feat['geometry'] = transformer(feat['geometry'])
                     yield feat
                 buffer = line.strip(u'\x1e')
             else:
                 buffer += line
         else:
             feat = json.loads(buffer)
+            feat['geometry'] = transformer(feat['geometry'])
             yield feat
     else:
         try:
             feat = json.loads(first_line)
             assert feat['type'] == 'Feature'
+            feat['geometry'] = transformer(feat['geometry'])
             yield feat
             for line in src:
                 feat = json.loads(line)
+                feat['geometry'] = transformer(feat['geometry'])
                 yield feat
         except (TypeError, KeyError, AssertionError, ValueError):
             text = "".join(chain([first_line], src))
             feats = json.loads(text)
             if feats['type'] == 'Feature':
+                feats['geometry'] = transformer(feats['geometry'])
                 yield feats
             elif feats['type'] == 'FeatureCollection':
                 for feat in feats['features']:
+                    feat['geometry'] = transformer(feat['geometry'])
                     yield feat
+
 
 def iter_query(query):
     """Accept a filename, stream, or string.
