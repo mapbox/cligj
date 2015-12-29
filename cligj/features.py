@@ -6,13 +6,20 @@ import click
 
 
 def normalize_feature_inputs(ctx, param, features_like):
-    """ Click callback which accepts the following values:
-    * Path to file(s), each containing single FeatureCollection or Feature
-    * Coordinate pair(s) of the form "[0, 0]" or "0, 0" or "0 0"
+    """Click callback that normalizes feature input values.
+
+    Returns an iterator over features from the features_like.
+
+    The features_like obj may be one of the following:
+
+    * Path to file(s), each containing single FeatureCollection or
+      Feature.
+    * Coordinate pair(s) of the form "[0, 0]" or "0, 0" or "0 0".
     * if not specified or '-', process STDIN stream containing
         - line-delimited features
         - ASCII Record Separator (0x1e) delimited features
         - FeatureCollection or Feature object
+
     and yields GeoJSON Features.
     """
     if len(features_like) == 0:
@@ -20,28 +27,27 @@ def normalize_feature_inputs(ctx, param, features_like):
 
     for flike in features_like:
         try:
-            # It's a file/stream with GeoJSON
+            # It's a file/stream with GeoJSON.
             src = iter(click.open_file(flike, mode='r'))
             for feature in iter_features(src):
                 yield feature
         except IOError:
-            # It's a coordinate string
+            # It's a coordinate string.
             coords = list(coords_from_query(flike))
-            feature = {
+            yield {
                 'type': 'Feature',
                 'properties': {},
                 'geometry': {
                     'type': 'Point',
                     'coordinates': coords}}
-            yield feature
 
 
 def iter_features(geojsonfile, func=None):
-    """Extract GeoJSON features from a GeoJSON file object.
+    """Extract GeoJSON features from a text file object.
 
     Given a file-like object containing a single GeoJSON feature
-    collection text or a sequence of GeoJSON, iter_features() iterates
-    over lines of the file and yields GeoJSON features.
+    collection text or a sequence of GeoJSON features, iter_features()
+    iterates over lines of the file and yields GeoJSON features.
 
     Parameters
     ----------
@@ -55,7 +61,7 @@ def iter_features(geojsonfile, func=None):
     func = func or (lambda x: x)
     first_line = next(geojsonfile)
 
-    # If input is RS-delimited JSON sequence.
+    # Does the geojsonfile contain RS-delimited JSON sequences?
     if first_line.startswith(u'\x1e'):
         text_buffer = first_line.strip(u'\x1e')
         for line in geojsonfile:
@@ -67,20 +73,33 @@ def iter_features(geojsonfile, func=None):
                 text_buffer += line
         else:
             yield func(json.loads(text_buffer))
+
+    # If not, it may contains LF-delimited GeoJSON objects or a single
+    # multi-line pretty-printed GeoJSON object.
     else:
+        # Try to parse LF-delimited sequences of features or feature
+        # collections produced by, e.g., `jq -c ...`.
         try:
-            feat = json.loads(first_line)
-            assert feat['type'] == 'Feature'
-            yield func(feat)
-            for line in geojsonfile:
-                yield func(json.loads(line))
-        except (TypeError, KeyError, AssertionError, ValueError):
+            obj = json.loads(first_line)
+            if obj['type'] == 'Feature':
+                yield func(obj)
+                for line in geojsonfile:
+                    yield func(json.loads(line))
+            elif obj['type'] == 'FeatureCollection':
+                for feat in obj['features']:
+                    yield func(feat)
+        # Indented or pretty-printed GeoJSON features or feature
+        # collections will fail out of the try clause above since 
+        # they'll have no complete JSON object on their first line.
+        # To handle these, we slurp in the entire file and parse its
+        # text.
+        except ValueError:
             text = "".join(chain([first_line], geojsonfile))
-            feats = json.loads(text)
-            if feats['type'] == 'Feature':
-                yield func(feats)
-            elif feats['type'] == 'FeatureCollection':
-                for feat in feats['features']:
+            obj = json.loads(text)
+            if obj['type'] == 'Feature':
+                yield func(obj)
+            elif obj['type'] == 'FeatureCollection':
+                for feat in obj['features']:
                     yield func(feat)
 
 

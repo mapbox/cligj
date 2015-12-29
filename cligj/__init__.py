@@ -16,6 +16,7 @@ files_in_arg = click.argument(
     required=True,
     metavar="INPUTS...")
 
+
 # Multiple files, last of which is an output file.
 files_inout_arg = click.argument(
     'files',
@@ -24,9 +25,11 @@ files_inout_arg = click.argument(
     required=True,
     metavar="INPUTS... OUTPUT")
 
+
 # Features input
 # Accepts multiple representations of GeoJSON features
-# Returns the input data as an iterable of GeoJSON Feature-like dictionaries
+# Returns the input data as an iterable of GeoJSON Feature-like
+# dictionaries.
 features_in_arg = click.argument(
     'features',
     nargs=-1,
