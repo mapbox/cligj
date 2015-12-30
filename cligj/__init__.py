@@ -26,8 +26,7 @@ files_inout_arg = click.argument(
     metavar="INPUTS... OUTPUT")
 
 
-# Features input
-# Accepts multiple representations of GeoJSON features
+# Features from files, command line args, or stdin.
 # Returns the input data as an iterable of GeoJSON Feature-like
 # dictionaries.
 features_in_arg = click.argument(

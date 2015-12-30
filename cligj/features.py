@@ -5,35 +5,32 @@ import re
 import click
 
 
-def normalize_feature_inputs(ctx, param, features_like):
+def normalize_feature_inputs(ctx, param, value):
     """Click callback that normalizes feature input values.
 
-    Returns an iterator over features from the features_like.
+    Returns a generator over features from the input value.
 
-    The features_like obj may be one of the following:
+    Parameters
+    ----------
+    ctx: a Click context
+    param: the name of the argument or option
+    value: object
+        The value argument may be one of the following:
 
-    * Path to file(s), each containing single FeatureCollection or
-      Feature.
-    * Coordinate pair(s) of the form "[0, 0]" or "0, 0" or "0 0".
-    * if not specified or '-', process STDIN stream containing
-        - line-delimited features
-        - ASCII Record Separator (0x1e) delimited features
-        - FeatureCollection or Feature object
+        1. A list of paths to files containing GeoJSON feature
+           collections or feature sequences.
+        2. A list of string-encoded coordinate pairs of the form
+           "[lng, lat]", or "lng, lat", or "lng lat".
 
-    and yields GeoJSON Features.
+        If no value is provided, features will be read from stdin.
     """
-    if len(features_like) == 0:
-        features_like = ('-',)
-
-    for flike in features_like:
+    for feature_like in value or ('-',):
         try:
-            # It's a file/stream with GeoJSON.
-            src = iter(click.open_file(flike, mode='r'))
-            for feature in iter_features(src):
-                yield feature
+            with click.open_file(feature_like) as src:
+                for feature in iter_features(iter(src)):
+                    yield feature
         except IOError:
-            # It's a coordinate string.
-            coords = list(coords_from_query(flike))
+            coords = list(coords_from_query(feature_like))
             yield {
                 'type': 'Feature',
                 'properties': {},
