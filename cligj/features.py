@@ -54,7 +54,7 @@ def iter_features(geojsonfile, func=None):
     func: function, optional
         A function that will be applied to each extracted feature. It
         takes a feature object and may return a replacement feature or
-        None – in which case iter_features does not yield.
+        None -- in which case iter_features does not yield.
     """
     func = func or (lambda x: x)
     first_line = next(geojsonfile)
