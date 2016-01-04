@@ -53,7 +53,8 @@ def iter_features(geojsonfile, func=None):
         lines of JSON text.
     func: function, optional
         A function that will be applied to each extracted feature. It
-        takes a feature object and returns a replacement feature.
+        takes a feature object and may return a replacement feature or
+        None – in which case iter_features does not yield.
     """
     func = func or (lambda x: x)
     first_line = next(geojsonfile)
@@ -64,12 +65,17 @@ def iter_features(geojsonfile, func=None):
         for line in geojsonfile:
             if line.startswith(u'\x1e'):
                 if text_buffer:
-                    yield func(json.loads(text_buffer))
+                    newfeat = func(json.loads(text_buffer))
+                    if newfeat:
+                        yield newfeat
                 text_buffer = line.strip(u'\x1e')
             else:
                 text_buffer += line
+        # complete our parsing with a for-else clause.
         else:
-            yield func(json.loads(text_buffer))
+            newfeat = func(json.loads(text_buffer))
+            if newfeat:
+                yield newfeat
 
     # If not, it may contains LF-delimited GeoJSON objects or a single
     # multi-line pretty-printed GeoJSON object.
@@ -79,12 +85,19 @@ def iter_features(geojsonfile, func=None):
         try:
             obj = json.loads(first_line)
             if obj['type'] == 'Feature':
-                yield func(obj)
+                newfeat = func(obj)
+                if newfeat:
+                    yield newfeat
                 for line in geojsonfile:
-                    yield func(json.loads(line))
+                    newfeat = func(json.loads(line))
+                    if newfeat:
+                        yield newfeat
             elif obj['type'] == 'FeatureCollection':
                 for feat in obj['features']:
-                    yield func(feat)
+                    newfeat = func(feat)
+                    if newfeat:
+                        yield newfeat
+
         # Indented or pretty-printed GeoJSON features or feature
         # collections will fail out of the try clause above since 
         # they'll have no complete JSON object on their first line.
@@ -94,10 +107,14 @@ def iter_features(geojsonfile, func=None):
             text = "".join(chain([first_line], geojsonfile))
             obj = json.loads(text)
             if obj['type'] == 'Feature':
-                yield func(obj)
+                newfeat = func(obj)
+                if newfeat:
+                    yield newfeat
             elif obj['type'] == 'FeatureCollection':
                 for feat in obj['features']:
-                    yield func(feat)
+                    newfeat = func(feat)
+                    if newfeat:
+                        yield newfeat
 
 
 def iter_query(query):
