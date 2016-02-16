@@ -123,6 +123,15 @@ def test_geometrysequence(expected_features):
     assert _geoms(features) == _geoms(expected_features)
 
 
+def test_geometrysequencers(expected_features):
+    features = normalize_feature_inputs(None, 'features', ["tests/twopoints_geom_seqrs.txt"])
+    assert _geoms(features) == _geoms(expected_features)
+
+
+def test_geometrypretty(expected_features):
+    features = normalize_feature_inputs(None, 'features', ["tests/point_pretty_geom.txt"])
+    assert _geoms(features)[0] == _geoms(expected_features)[0]
+
 class MockGeo(object):
     def __init__(self, feature):
         self.__geo_interface__ = feature

@@ -65,7 +65,10 @@ def iter_features(geojsonfile, func=None):
         for line in geojsonfile:
             if line.startswith(u'\x1e'):
                 if text_buffer:
-                    newfeat = func(json.loads(text_buffer))
+                    obj = json.loads(text_buffer)
+                    if 'coordinates' in obj:
+                        obj = to_feature(obj)
+                    newfeat = func(obj)
                     if newfeat:
                         yield newfeat
                 text_buffer = line.strip(u'\x1e')
@@ -73,7 +76,10 @@ def iter_features(geojsonfile, func=None):
                 text_buffer += line
         # complete our parsing with a for-else clause.
         else:
-            newfeat = func(json.loads(text_buffer))
+            obj = json.loads(text_buffer)
+            if 'coordinates' in obj:
+                obj = to_feature(obj)
+            newfeat = func(obj)
             if newfeat:
                 yield newfeat
 
