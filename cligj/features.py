@@ -5,74 +5,128 @@ import re
 import click
 
 
-def normalize_feature_inputs(ctx, param, features_like):
-    """ Click callback which accepts the following values:
-    * Path to file(s), each containing single FeatureCollection or Feature
-    * Coordinate pair(s) of the form "[0, 0]" or "0, 0" or "0 0"
-    * if not specified or '-', process STDIN stream containing
-        - line-delimited features
-        - ASCII Record Separator (0x1e) delimited features
-        - FeatureCollection or Feature object
-    and yields GeoJSON Features.
-    """
-    if len(features_like) == 0:
-        features_like = ('-',)
+def normalize_feature_inputs(ctx, param, value):
+    """Click callback that normalizes feature input values.
 
-    for flike in features_like:
+    Returns a generator over features from the input value.
+
+    Parameters
+    ----------
+    ctx: a Click context
+    param: the name of the argument or option
+    value: object
+        The value argument may be one of the following:
+
+        1. A list of paths to files containing GeoJSON feature
+           collections or feature sequences.
+        2. A list of string-encoded coordinate pairs of the form
+           "[lng, lat]", or "lng, lat", or "lng lat".
+
+        If no value is provided, features will be read from stdin.
+    """
+    for feature_like in value or ('-',):
         try:
-            # It's a file/stream with GeoJSON
-            src = iter(click.open_file(flike, mode='r'))
-            for feature in iter_features(src):
-                yield feature
+            with click.open_file(feature_like) as src:
+                for feature in iter_features(iter(src)):
+                    yield feature
         except IOError:
-            # It's a coordinate string
-            coords = list(coords_from_query(flike))
-            feature = {
+            coords = list(coords_from_query(feature_like))
+            yield {
                 'type': 'Feature',
                 'properties': {},
                 'geometry': {
                     'type': 'Point',
                     'coordinates': coords}}
-            yield feature
 
 
-def iter_features(src):
-    """Yield features from a src that may be either a GeoJSON feature
-    text sequence or GeoJSON feature collection."""
-    first_line = next(src)
-    # If input is RS-delimited JSON sequence.
+def iter_features(geojsonfile, func=None):
+    """Extract GeoJSON features from a text file object.
+
+    Given a file-like object containing a single GeoJSON feature
+    collection text or a sequence of GeoJSON features, iter_features()
+    iterates over lines of the file and yields GeoJSON features.
+
+    Parameters
+    ----------
+    geojsonfile: a file-like object
+        The geojsonfile implements the iterator protocol and yields
+        lines of JSON text.
+    func: function, optional
+        A function that will be applied to each extracted feature. It
+        takes a feature object and may return a replacement feature or
+        None -- in which case iter_features does not yield.
+    """
+    func = func or (lambda x: x)
+    first_line = next(geojsonfile)
+
+    # Does the geojsonfile contain RS-delimited JSON sequences?
     if first_line.startswith(u'\x1e'):
-        buffer = first_line.strip(u'\x1e')
-        for line in src:
+        text_buffer = first_line.strip(u'\x1e')
+        for line in geojsonfile:
             if line.startswith(u'\x1e'):
-                if buffer:
-                    feat = json.loads(buffer)
-                    yield feat
-                buffer = line.strip(u'\x1e')
+                if text_buffer:
+                    newfeat = func(json.loads(text_buffer))
+                    if newfeat:
+                        yield newfeat
+                text_buffer = line.strip(u'\x1e')
             else:
-                buffer += line
+                text_buffer += line
+        # complete our parsing with a for-else clause.
         else:
-            feat = json.loads(buffer)
-            yield feat
+            newfeat = func(json.loads(text_buffer))
+            if newfeat:
+                yield newfeat
+
+    # If not, it may contains LF-delimited GeoJSON objects or a single
+    # multi-line pretty-printed GeoJSON object.
     else:
+        # Try to parse LF-delimited sequences of features or feature
+        # collections produced by, e.g., `jq -c ...`.
         try:
-            # Process each line as GeoJSON object
-            feat = json.loads(first_line)
-            if not (feat['type'] == 'Feature' or 'coordinates' in feat):
-                raise AssertionError("Not a feature or geometry")
-            yield to_feature(feat)
-            for line in src:
-                feat = json.loads(line)
-                yield to_feature(feat)
-        except (TypeError, KeyError, AssertionError, ValueError):
-            # Process entire stream as a single GeoJSON object
-            text = "".join(chain([first_line], src))
-            feats = json.loads(text)
-            if feats['type'] == 'Feature' or 'coordinates' in feats:
-                yield to_feature(feats)
-            elif feats['type'] == 'FeatureCollection':
-                for feat in feats['features']:
-                    yield feat
+            obj = json.loads(first_line)
+            if obj['type'] == 'Feature':
+                newfeat = func(obj)
+                if newfeat:
+                    yield newfeat
+                for line in geojsonfile:
+                    newfeat = func(json.loads(line))
+                    if newfeat:
+                        yield newfeat
+            elif obj['type'] == 'FeatureCollection':
+                for feat in obj['features']:
+                    newfeat = func(feat)
+                    if newfeat:
+                        yield newfeat
+            elif 'coordinates' in obj:
+                newfeat = func(to_feature(obj))
+                if newfeat:
+                    yield newfeat
+                for line in geojsonfile:
+                    newfeat = func(to_feature(json.loads(line)))
+                    if newfeat:
+                        yield newfeat
+
+        # Indented or pretty-printed GeoJSON features or feature
+        # collections will fail out of the try clause above since
+        # they'll have no complete JSON object on their first line.
+        # To handle these, we slurp in the entire file and parse its
+        # text.
+        except ValueError:
+            text = "".join(chain([first_line], geojsonfile))
+            obj = json.loads(text)
+            if obj['type'] == 'Feature':
+                newfeat = func(obj)
+                if newfeat:
+                    yield newfeat
+            elif obj['type'] == 'FeatureCollection':
+                for feat in obj['features']:
+                    newfeat = func(feat)
+                    if newfeat:
+                        yield newfeat
+            elif 'coordinates' in obj:
+                newfeat = func(to_feature(obj))
+                if newfeat:
+                    yield newfeat
 
 
 def to_feature(obj):

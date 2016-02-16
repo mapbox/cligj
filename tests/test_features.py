@@ -46,7 +46,14 @@ def _geoms(features):
 
 
 def test_featurecollection_file(expected_features):
-    features = normalize_feature_inputs(None, 'features', ["tests/twopoints.geojson"])
+    features = normalize_feature_inputs(
+        None, 'features', ["tests/twopoints.geojson"])
+    assert _geoms(features) == _geoms(expected_features)
+
+
+def test_featurecollection_pretty_file(expected_features):
+    features = normalize_feature_inputs(
+        None, 'features', ["tests/twopoints-pretty.json"])
     assert _geoms(features) == _geoms(expected_features)
 
 
@@ -57,7 +64,8 @@ def test_featurecollection_stdin(expected_features):
 
 
 def test_featuresequence(expected_features):
-    features = normalize_feature_inputs(None, 'features', ["tests/twopoints_seq.txt"])
+    features = normalize_feature_inputs(
+        None, 'features', ["tests/twopoints_seq.txt"])
     assert _geoms(features) == _geoms(expected_features)
 
 # TODO test path to sequence files fail
@@ -69,7 +77,8 @@ def test_featuresequence_stdin(expected_features):
 
 
 def test_singlefeature(expected_features):
-    features = normalize_feature_inputs(None, 'features', ["tests/onepoint.geojson"])
+    features = normalize_feature_inputs(
+        None, 'features', ["tests/onepoint.geojson"])
     assert _geoms(features) == _geoms([expected_features[0]])
 
 
@@ -80,7 +89,8 @@ def test_singlefeature_stdin(expected_features):
 
 
 def test_featuresequencers(expected_features):
-    features = normalize_feature_inputs(None, 'features', ["tests/twopoints_seqrs.txt"])
+    features = normalize_feature_inputs(
+        None, 'features', ["tests/twopoints_seqrs.txt"])
     assert _geoms(features) == _geoms(expected_features)
 
 
