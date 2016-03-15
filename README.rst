@@ -101,7 +101,7 @@ a delimiter, use the ``--rs`` option
         if sequence:
             for feature in process_features(features):
                 if use_rs:
-                    click.echo(b'\x1e', nl=False)
+                    click.echo(u'\x1e', nl=False)
                 click.echo(json.dumps(feature))
         else:
             click.echo(json.dumps(
