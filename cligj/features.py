@@ -65,7 +65,10 @@ def iter_features(geojsonfile, func=None):
         for line in geojsonfile:
             if line.startswith(u'\x1e'):
                 if text_buffer:
-                    newfeat = func(json.loads(text_buffer))
+                    obj = json.loads(text_buffer)
+                    if 'coordinates' in obj:
+                        obj = to_feature(obj)
+                    newfeat = func(obj)
                     if newfeat:
                         yield newfeat
                 text_buffer = line.strip(u'\x1e')
@@ -73,7 +76,10 @@ def iter_features(geojsonfile, func=None):
                 text_buffer += line
         # complete our parsing with a for-else clause.
         else:
-            newfeat = func(json.loads(text_buffer))
+            obj = json.loads(text_buffer)
+            if 'coordinates' in obj:
+                obj = to_feature(obj)
+            newfeat = func(obj)
             if newfeat:
                 yield newfeat
 
@@ -97,9 +103,17 @@ def iter_features(geojsonfile, func=None):
                     newfeat = func(feat)
                     if newfeat:
                         yield newfeat
+            elif 'coordinates' in obj:
+                newfeat = func(to_feature(obj))
+                if newfeat:
+                    yield newfeat
+                for line in geojsonfile:
+                    newfeat = func(to_feature(json.loads(line)))
+                    if newfeat:
+                        yield newfeat
 
         # Indented or pretty-printed GeoJSON features or feature
-        # collections will fail out of the try clause above since 
+        # collections will fail out of the try clause above since
         # they'll have no complete JSON object on their first line.
         # To handle these, we slurp in the entire file and parse its
         # text.
@@ -115,6 +129,26 @@ def iter_features(geojsonfile, func=None):
                     newfeat = func(feat)
                     if newfeat:
                         yield newfeat
+            elif 'coordinates' in obj:
+                newfeat = func(to_feature(obj))
+                if newfeat:
+                    yield newfeat
+
+
+def to_feature(obj):
+    """Takes a feature or a geometry
+    returns feature verbatim or
+    wraps geom in a feature with empty properties
+    """
+    if obj['type'] == 'Feature':
+        return obj
+    elif 'coordinates' in obj:
+        return {
+            'type': 'Feature',
+            'properties': {},
+            'geometry': obj}
+    else:
+        raise ValueError("Object is not a feature or geometry")
 
 
 def iter_query(query):

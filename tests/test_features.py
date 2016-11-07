@@ -4,7 +4,7 @@ import sys
 import pytest
 
 from cligj.features import \
-    coords_from_query, iter_query, \
+    coords_from_query, iter_query, to_feature, \
     normalize_feature_inputs, normalize_feature_objects
 
 
@@ -118,6 +118,20 @@ def test_coordpairs_space(expected_features):
     assert _geoms(features) == _geoms(expected_features)
 
 
+def test_geometrysequence(expected_features):
+    features = normalize_feature_inputs(None, 'features', ["tests/twopoints_geom_seq.txt"])
+    assert _geoms(features) == _geoms(expected_features)
+
+
+def test_geometrysequencers(expected_features):
+    features = normalize_feature_inputs(None, 'features', ["tests/twopoints_geom_seqrs.txt"])
+    assert _geoms(features) == _geoms(expected_features)
+
+
+def test_geometrypretty(expected_features):
+    features = normalize_feature_inputs(None, 'features', ["tests/point_pretty_geom.txt"])
+    assert _geoms(features)[0] == _geoms(expected_features)[0]
+
 class MockGeo(object):
     def __init__(self, feature):
         self.__geo_interface__ = feature
@@ -134,3 +148,10 @@ def test_normalize_feature_objects_bad(expected_features):
     objs.append(MockGeo(dict()))
     with pytest.raises(ValueError):
         list(normalize_feature_objects(objs))
+
+def test_to_feature(expected_features):
+    geom = expected_features[0]['geometry']
+    feat = {'type': 'Feature', 'properties': {}, 'geometry': geom}
+    assert to_feature(feat) == to_feature(geom)
+    with pytest.raises(ValueError):
+        assert to_feature({'type': 'foo'})
