@@ -163,7 +163,7 @@ def test_sequence(runner):
 
     result = runner.invoke(cmd)
     assert not result.exception
-    assert result.output.splitlines() == ['False']
+    assert result.output.splitlines() == ['True']
 
     result = runner.invoke(cmd, ['--sequence'])
     assert not result.exception

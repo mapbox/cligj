@@ -76,11 +76,10 @@ or, optionally, a sequence of individual features. Since most software that
 reads and writes GeoJSON expects a text containing a single feature collection,
 that's the default, and a LF-delimited sequence of texts containing one GeoJSON
 feature each is a feature that is turned on using the ``--sequence`` option.
-To write sequences of feature texts that conform to the `JSON Text Sequences
-proposed standard
-<http://tools.ietf.org/html/draft-ietf-json-text-sequence-13>`__ (and might
-contain pretty-printed JSON) with the ASCII Record Separator (0x1e) as
-a delimiter, use the ``--rs`` option
+To write sequences of feature texts that conform to the `RFC 7464 JSON Text
+Sequences standard <https://tools.ietf.org/html/rfc7464>`__ (and might contain
+pretty-printed JSON) with the ASCII Record Separator (0x1e) as a delimiter, use
+the ``--rs`` option
 
 .. code-block:: python
 
