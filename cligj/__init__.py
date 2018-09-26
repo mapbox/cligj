@@ -49,7 +49,7 @@ quiet_opt = click.option(
 
 # Format driver option.
 format_opt = click.option(
-    '-f', '--format', '--driver',
+    '-f', '--format', '--driver', 'driver',
     default='GTiff',
     help="Output format driver")
 
