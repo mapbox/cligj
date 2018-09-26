@@ -6,6 +6,7 @@ import click
 
 from .features import normalize_feature_inputs
 
+
 # Arguments.
 
 # Multiple input files.
@@ -95,18 +96,17 @@ projection_mercator_opt = click.option(
 # Feature collection or feature sequence switch.
 sequence_opt = click.option(
     '--sequence/--no-sequence',
-    default=False,
+    default=True,
     help="Write a LF-delimited sequence of texts containing individual "
-         "objects or write a single JSON text containing a feature "
-         "collection object (the default).")
+         "objects (the default) or write a single JSON text containing a "
+         "feature collection object.")
 
 use_rs_opt = click.option(
     '--rs/--no-rs',
     'use_rs',
     default=False,
     help="Use RS (0x1E) as a prefix for individual texts in a sequence "
-         "as per http://tools.ietf.org/html/draft-ietf-json-text-sequence-13 "
-         "(default is False).")
+         "as per https://tools.ietf.org/html/rfc7464 (default is False).")
 
 
 # GeoJSON output mode option.
@@ -119,7 +119,7 @@ def geojson_type_collection_opt(default=False):
         help="Output as GeoJSON feature collection(s).")
 
 
-def geojson_type_feature_opt(default=False):
+def geojson_type_feature_opt(default=True):
     return click.option(
         '--feature',
         'geojson_type',
