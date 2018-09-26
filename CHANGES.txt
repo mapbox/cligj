@@ -1,21 +1,37 @@
+Changes
+=======
+
+0.5.0 (2018-09-26)
+------------------
+
+- Version 0.4.0 is not compatible with click 7, but version 0.5.0 is (#23).
+- The features_in_arg handler now takes sequences of geometry objects (#14).
+- The iter_features function has a new per-feature callback and is ready for
+  use in other projects like Fiona (#15).
+- The plugins module has been removed (#17).
+
 0.4.0 (2015-12-17)
 ------------------
+
 - Introduces a click argument, `features_in_arg`, which utilizes a click
   callback to normalize the input of geojson features (#9).
 - Release from tagged Travis CI builds (#10).
 
 0.3.0 (2015-08-12)
 ------------------
+
 - Deprecation of the cligj.plugins module (#6). Please switch to the 
   click-plugins module: https://github.com/click-contrib/click-plugins. The
   cligj.plugins module will be removed from cligj at version 1.0.
 
 0.2.0 (2015-05-28)
 ------------------
+
 - Addition of a pluggable command group class and a corresponding click-style
   decorator (#2, #3).
 
 0.1.0 (2015-01-06)
 ------------------
+
 - Initial release: a collection of GeoJSON-related command line arguments and
   options for use with Click (#1).

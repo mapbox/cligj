@@ -166,7 +166,8 @@ def coords_from_query(query):
     try:
         coords = json.loads(query)
     except ValueError:
-        vals = re.split(r"\,*\s*", query.strip())
+        query = query.replace(',', ' ')
+        vals = query.split()
         coords = [float(v) for v in vals]
     return tuple(coords[:2])
 
