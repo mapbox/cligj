@@ -1,0 +1,4 @@
+include CHANGES.txt
+include LICENSE
+
+graft tests
