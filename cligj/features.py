@@ -1,3 +1,5 @@
+"""Feature parsing and normalization"""
+
 from itertools import chain
 import json
 import re
@@ -23,10 +25,16 @@ def normalize_feature_inputs(ctx, param, value):
            "[lng, lat]", or "lng, lat", or "lng lat".
 
         If no value is provided, features will be read from stdin.
+
+    Yields
+    ------
+    Mapping
+        A GeoJSON Feature represented by a Python mapping
+
     """
     for feature_like in value or ('-',):
         try:
-            with click.open_file(feature_like) as src:
+            with click.open_file(feature_like, encoding="utf-8") as src:
                 for feature in iter_features(iter(src)):
                     yield feature
         except IOError:
@@ -55,6 +63,12 @@ def iter_features(geojsonfile, func=None):
         A function that will be applied to each extracted feature. It
         takes a feature object and may return a replacement feature or
         None -- in which case iter_features does not yield.
+
+    Yields
+    ------
+    Mapping
+        A GeoJSON Feature represented by a Python mapping
+
     """
     func = func or (lambda x: x)
     first_line = next(geojsonfile)
@@ -136,9 +150,20 @@ def iter_features(geojsonfile, func=None):
 
 
 def to_feature(obj):
-    """Takes a feature or a geometry
-    returns feature verbatim or
-    wraps geom in a feature with empty properties
+    """Converts an object to a GeoJSON Feature
+
+    Returns feature verbatim or wraps geom in a feature with empty
+    properties.
+
+    Raises
+    ------
+    ValueError
+
+    Returns
+    -------
+    Mapping
+        A GeoJSON Feature represented by a Python mapping
+
     """
     if obj['type'] == 'Feature':
         return obj
@@ -177,13 +202,13 @@ def normalize_feature_objects(feature_objs):
     an iterable of objects with a geo interface and
     normalizes it to the former."""
     for obj in feature_objs:
-        if hasattr(obj, "__geo_interface__") and \
-           'type' in obj.__geo_interface__.keys() and \
-           obj.__geo_interface__['type'] == 'Feature':
+        if (
+            hasattr(obj, "__geo_interface__")
+            and "type" in obj.__geo_interface__.keys()
+            and obj.__geo_interface__["type"] == "Feature"
+        ):
             yield obj.__geo_interface__
-        elif isinstance(obj, dict) and 'type' in obj and \
-                obj['type'] == 'Feature':
+        elif isinstance(obj, dict) and "type" in obj and obj["type"] == "Feature":
             yield obj
         else:
-            raise ValueError("Did not recognize object {0}"
-                             "as GeoJSON Feature".format(obj))
+            raise ValueError("Did not recognize object as GeoJSON Feature")

@@ -1,6 +1,8 @@
-# cligj
+"""cligj
 
-# Shared arguments and options.
+A package of arguments, options, and parsers for the Python GeoJSON
+ecosystem.
+"""
 
 import click
 
@@ -109,8 +111,8 @@ use_rs_opt = click.option(
          "(default is False).")
 
 
-# GeoJSON output mode option.
 def geojson_type_collection_opt(default=False):
+    """GeoJSON FeatureCollection output mode"""
     return click.option(
         '--collection',
         'geojson_type',
@@ -120,6 +122,7 @@ def geojson_type_collection_opt(default=False):
 
 
 def geojson_type_feature_opt(default=False):
+    """GeoJSON Feature or Feature sequence output mode"""
     return click.option(
         '--feature',
         'geojson_type',
@@ -129,6 +132,7 @@ def geojson_type_feature_opt(default=False):
 
 
 def geojson_type_bbox_opt(default=False):
+    """GeoJSON bbox output mode"""
     return click.option(
         '--bbox',
         'geojson_type',

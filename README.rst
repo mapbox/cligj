@@ -10,7 +10,7 @@ cligj
 Common arguments and options for GeoJSON processing commands, using Click.
 
 `cligj` is for Python developers who create command line interfaces for geospatial data.
-`cligj` allows you to quickly build consistent, well-tested and interoperable CLIs for handling GeoJSON. 
+`cligj` allows you to quickly build consistent, well-tested and interoperable CLIs for handling GeoJSON.
 
 
 Arguments
@@ -76,11 +76,15 @@ or, optionally, a sequence of individual features. Since most software that
 reads and writes GeoJSON expects a text containing a single feature collection,
 that's the default, and a LF-delimited sequence of texts containing one GeoJSON
 feature each is a feature that is turned on using the ``--sequence`` option.
-To write sequences of feature texts that conform to the `JSON Text Sequences
-proposed standard
-<http://tools.ietf.org/html/draft-ietf-json-text-sequence-13>`__ (and might
-contain pretty-printed JSON) with the ASCII Record Separator (0x1e) as
-a delimiter, use the ``--rs`` option
+To write sequences of feature texts that conform to the `GeoJSON Text Sequences
+standard <https://tools.ietf.org/html/rfc8142>`__ (and might contain
+pretty-printed JSON) with the ASCII Record Separator (0x1e) as a delimiter, use
+the ``--rs`` option
+
+.. warning:: Future change warning
+   GeoJSON sequences (`--sequence`), not collections (`--no-sequence`), will be
+   the default in version 1.0.0.
+
 
 .. code-block:: python
 
@@ -124,7 +128,6 @@ On the command line, the generated help text explains the usage
                                 /draft-ietf-json-text-sequence-13 (default is
                                 False).
     --help                      Show this message and exit.
-
 
 And can be used like this
 

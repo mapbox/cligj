@@ -1,6 +1,19 @@
 Changes
 =======
 
+0.6b1 (2020-10-14)
+------------------
+
+Future changes:
+
+- Feature sequences, not collections, will be the default form of output in
+  version 1.0 (#20).
+
+Bug fixes:
+
+- Always use `encoding='utf-8'` when opening input GeoJSON (#27).
+- Improve docstrings (#22).
+
 0.5.0 (2018-09-26)
 ------------------
 
@@ -20,7 +33,7 @@ Changes
 0.3.0 (2015-08-12)
 ------------------
 
-- Deprecation of the cligj.plugins module (#6). Please switch to the 
+- Deprecation of the cligj.plugins module (#6). Please switch to the
   click-plugins module: https://github.com/click-contrib/click-plugins. The
   cligj.plugins module will be removed from cligj at version 1.0.
 
