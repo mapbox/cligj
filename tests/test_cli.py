@@ -1,5 +1,6 @@
 import os
 import os.path
+import warnings
 
 import click
 import pytest
@@ -185,6 +186,7 @@ def test_sequence_warns(runner, recwarn):
     def cmd(sequence):
         click.echo(str(sequence))
 
+    warnings.simplefilter("always")
     result = runner.invoke(cmd, ["--sequence"])
     assert len(recwarn) == 1
     assert recwarn.pop(FutureWarning)
