@@ -4,7 +4,7 @@ A package of arguments, options, and parsers for the Python GeoJSON
 ecosystem.
 """
 
-from functools import partial
+import sys
 from warnings import warn
 
 import click
@@ -13,7 +13,9 @@ from .features import normalize_feature_inputs
 
 __version__ = "0.7dev"
 
-# Arguments.
+if sys.version_info < (3, 7):
+    warn("cligj 1.0.0 will require Python >= 3.7", FutureWarning)
+
 
 # Multiple input files.
 files_in_arg = click.argument(
