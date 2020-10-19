@@ -4,9 +4,14 @@ A package of arguments, options, and parsers for the Python GeoJSON
 ecosystem.
 """
 
+from functools import partial
+from warnings import warn
+
 import click
 
 from .features import normalize_feature_inputs
+
+__version__ = "0.6.1dev"
 
 # Arguments.
 
@@ -99,8 +104,14 @@ sequence_opt = click.option(
     '--sequence/--no-sequence',
     default=False,
     help="Write a LF-delimited sequence of texts containing individual "
-         "objects or write a single JSON text containing a feature "
-         "collection object (the default).")
+    "objects or write a single JSON text containing a feature "
+    "collection object (the default).",
+    callback=lambda ctx, param, value: warn(
+        "Sequences of Features, not FeatureCollections, will be the default in version 1.0.0",
+        FutureWarning,
+    )
+    or value,
+)
 
 use_rs_opt = click.option(
     '--rs/--no-rs',

@@ -2,6 +2,7 @@ import os
 import os.path
 
 import click
+import pytest
 
 import cligj
 
@@ -155,26 +156,42 @@ def test_projection(runner):
     assert result.output.splitlines() == ['geographic']
 
 
-def test_sequence(runner):
+@pytest.mark.filterwarnings("ignore")
+@pytest.mark.parametrize(
+    ("opt", "val"),
+    [
+        ("--sequence", True),
+        ("--no-sequence", False),
+        (None, cligj.__version__.startswith("1.0")),
+    ],
+)
+def test_sequence(runner, opt, val):
+    """True becomes the default in 1.0"""
     @click.command()
     @cligj.sequence_opt
     def cmd(sequence):
         click.echo("%s" % sequence)
 
-    result = runner.invoke(cmd)
+    result = runner.invoke(cmd, [opt] if opt is not None else [])
     assert not result.exception
-    assert result.output.splitlines() == ['False']
-
-    result = runner.invoke(cmd, ['--sequence'])
-    assert not result.exception
-    assert result.output.splitlines() == ['True']
-
-    result = runner.invoke(cmd, ['--no-sequence'])
-    assert not result.exception
-    assert result.output.splitlines() == ['False']
+    assert result.output.splitlines() == [str(val)]
 
 
-def test_sequence_rs(runner):
+@pytest.mark.xfail(cligj.__version__.startswith("1.0"), reason="No warning in 1.0")
+def test_sequence_warns(runner):
+    """Warn about --sequence until 1.0"""
+
+    @click.command()
+    @cligj.sequence_opt
+    def cmd(sequence):
+        click.echo("%s" % sequence)
+
+    with pytest.warns(FutureWarning):
+        result = runner.invoke(cmd, ["--sequence"])
+
+
+@pytest.mark.parametrize(("opt", "val"), [("--rs", True), (None, False)])
+def test_sequence_rs(runner, opt, val):
     @click.command()
     @cligj.sequence_opt
     @cligj.use_rs_opt
@@ -182,13 +199,10 @@ def test_sequence_rs(runner):
         click.echo("%s" % sequence)
         click.echo("%s" % use_rs)
 
-    result = runner.invoke(cmd, ['--sequence', '--rs'])
+    with pytest.warns(FutureWarning):
+        result = runner.invoke(cmd, ["--sequence"] + ([opt] if opt is not None else []))
     assert not result.exception
-    assert result.output.splitlines() == ['True', 'True']
-
-    result = runner.invoke(cmd, ['--sequence'])
-    assert not result.exception
-    assert result.output.splitlines() == ['True', 'False']
+    assert result.output.splitlines() == ["True", str(val)]
 
 
 def test_geojson_type(runner):
