@@ -178,16 +178,16 @@ def test_sequence(runner, opt, val):
 
 
 @pytest.mark.xfail(cligj.__version__.startswith("1.0"), reason="No warning in 1.0")
-def test_sequence_warns(runner):
+def test_sequence_warns(runner, recwarn):
     """Warn about --sequence until 1.0"""
-
     @click.command()
     @cligj.sequence_opt
     def cmd(sequence):
         click.echo(str(sequence))
 
-    with pytest.warns(FutureWarning):
-        result = runner.invoke(cmd, ["--sequence"])
+    result = runner.invoke(cmd, ["--sequence"])
+    assert len(recwarn) == 1
+    assert recwarn.pop(FutureWarning)
 
 
 @pytest.mark.filterwarnings("ignore")
