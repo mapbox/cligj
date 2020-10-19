@@ -1,6 +1,6 @@
 import os
 import os.path
-import warnings
+import sys
 
 import click
 import pytest
@@ -178,18 +178,17 @@ def test_sequence(runner, opt, val):
     assert result.output.splitlines() == [str(val)]
 
 
+@pytest.mark.skipif(sys.version_info < (3,), reason="Requires Python 3")
 @pytest.mark.xfail(cligj.__version__.startswith("1.0"), reason="No warning in 1.0")
-def test_sequence_warns(runner, recwarn):
+def test_sequence_warns(runner):
     """Warn about --sequence until 1.0"""
     @click.command()
     @cligj.sequence_opt
     def cmd(sequence):
         click.echo(str(sequence))
 
-    warnings.simplefilter("always")
-    result = runner.invoke(cmd, ["--sequence"])
-    assert len(recwarn) == 1
-    assert recwarn.pop(FutureWarning)
+    with pytest.warns(FutureWarning):
+        result = runner.invoke(cmd, ["--sequence"])
 
 
 @pytest.mark.filterwarnings("ignore")
