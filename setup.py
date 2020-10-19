@@ -9,7 +9,7 @@ with codecs_open('README.rst', encoding='utf-8') as f:
 
 setup(
     name="cligj",
-    version="0.6b1",
+    version="0.6.0",
     description=u"Click params for commmand line interfaces to GeoJSON",
     long_description=long_description,
     classifiers=[],
