@@ -11,7 +11,7 @@ import click
 
 from .features import normalize_feature_inputs
 
-__version__ = "0.6.1dev"
+__version__ = "0.7dev"
 
 # Arguments.
 
