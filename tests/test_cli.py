@@ -1,7 +1,9 @@
 import os
 import os.path
+import sys
 
 import click
+import pytest
 
 import cligj
 
@@ -155,62 +157,67 @@ def test_projection(runner):
     assert result.output.splitlines() == ['geographic']
 
 
-def test_sequence(runner):
+@pytest.mark.filterwarnings("ignore")
+@pytest.mark.parametrize(
+    ("opt", "val"),
+    [
+        ("--sequence", True),
+        ("--no-sequence", False),
+        (None, cligj.__version__.startswith("1.0")),
+    ],
+)
+def test_sequence(runner, opt, val):
+    """True becomes the default in 1.0"""
     @click.command()
     @cligj.sequence_opt
     def cmd(sequence):
-        click.echo("%s" % sequence)
+        click.echo(str(sequence))
 
-    result = runner.invoke(cmd)
+    result = runner.invoke(cmd, [opt] if opt is not None else [])
     assert not result.exception
-    assert result.output.splitlines() == ['False']
-
-    result = runner.invoke(cmd, ['--sequence'])
-    assert not result.exception
-    assert result.output.splitlines() == ['True']
-
-    result = runner.invoke(cmd, ['--no-sequence'])
-    assert not result.exception
-    assert result.output.splitlines() == ['False']
+    assert result.output.splitlines() == [str(val)]
 
 
-def test_sequence_rs(runner):
+@pytest.mark.skipif(sys.version_info < (3,), reason="Requires Python 3")
+@pytest.mark.xfail(cligj.__version__.startswith("1.0"), reason="No warning in 1.0")
+def test_sequence_warns(runner):
+    """Warn about --sequence until 1.0"""
+    @click.command()
+    @cligj.sequence_opt
+    def cmd(sequence):
+        click.echo(str(sequence))
+
+    with pytest.warns(FutureWarning):
+        result = runner.invoke(cmd, ["--sequence"])
+
+
+@pytest.mark.filterwarnings("ignore")
+@pytest.mark.parametrize(("opt", "val"), [("--rs", True), (None, False)])
+def test_sequence_rs(runner, opt, val):
     @click.command()
     @cligj.sequence_opt
     @cligj.use_rs_opt
     def cmd(sequence, use_rs):
-        click.echo("%s" % sequence)
-        click.echo("%s" % use_rs)
+        click.echo(str(sequence))
+        click.echo(str(use_rs))
 
-    result = runner.invoke(cmd, ['--sequence', '--rs'])
+    result = runner.invoke(cmd, ["--sequence"] + ([opt] if opt is not None else []))
     assert not result.exception
-    assert result.output.splitlines() == ['True', 'True']
-
-    result = runner.invoke(cmd, ['--sequence'])
-    assert not result.exception
-    assert result.output.splitlines() == ['True', 'False']
+    assert result.output.splitlines() == ["True", str(val)]
 
 
-def test_geojson_type(runner):
+@pytest.mark.parametrize(
+    ("opt", "val"),
+    [("--collection", "collection"), ("--feature", "feature"), ("--bbox", "bbox")],
+)
+def test_geojson_type(runner, opt, val):
     @click.command()
     @cligj.geojson_type_collection_opt(True)
     @cligj.geojson_type_feature_opt(False)
     @cligj.geojson_type_bbox_opt(False)
     def cmd(geojson_type):
-        click.echo("%s" % geojson_type)
+        click.echo(str(geojson_type))
 
-    result = runner.invoke(cmd)
+    result = runner.invoke(cmd, [opt])
     assert not result.exception
-    assert result.output.splitlines() == ['collection']
-
-    result = runner.invoke(cmd, ['--collection'])
-    assert not result.exception
-    assert result.output.splitlines() == ['collection']
-
-    result = runner.invoke(cmd, ['--feature'])
-    assert not result.exception
-    assert result.output.splitlines() == ['feature']
-
-    result = runner.invoke(cmd, ['--bbox'])
-    assert not result.exception
-    assert result.output.splitlines() == ['bbox']
+    assert result.output.splitlines() == [val]
