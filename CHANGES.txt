@@ -1,9 +1,10 @@
 Changes
 =======
 
-0.7dev
-------
+0.7.0 (2010-10-21)
+------------------
 
+- Warn about deprecation of support for Python versions < 3.7 in 1.0.0 (#33).
 - Warn about future change in --sequence default when the option is used (#31).
 
 0.6.0 (2020-10-19)
