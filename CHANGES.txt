@@ -1,6 +1,12 @@
 Changes
 =======
 
+0.7.1 (2010-11-20)
+------------------
+
+- Future deprecation warning added in 0.7.0 has been changed. Cligj version
+  1.0.0 will support Python versions >= 3.6.
+
 0.7.0 (2010-10-21)
 ------------------
 

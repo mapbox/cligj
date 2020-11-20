@@ -11,10 +11,10 @@ import click
 
 from .features import normalize_feature_inputs
 
-__version__ = "0.7.0"
+__version__ = "0.7.1dev"
 
-if sys.version_info < (3, 7):
-    warn("cligj 1.0.0 will require Python >= 3.7", FutureWarning)
+if sys.version_info < (3, 6):
+    warn("cligj 1.0.0 will require Python >= 3.6", FutureWarning)
 
 
 # Multiple input files.
