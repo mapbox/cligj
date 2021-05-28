@@ -11,7 +11,7 @@ import click
 
 from .features import normalize_feature_inputs
 
-__version__ = "0.7.1"
+__version__ = "0.7.2"
 
 if sys.version_info < (3, 6):
     warn("cligj 1.0.0 will require Python >= 3.6", FutureWarning)
