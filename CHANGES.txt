@@ -1,13 +1,18 @@
 Changes
 =======
 
-0.7.1 (2010-11-20)
+0.7.2 (2021-05-28)
+------------------
+
+- Permit use with click versions 8 and higher.
+
+0.7.1 (2020-11-20)
 ------------------
 
 - Future deprecation warning added in 0.7.0 has been changed. Cligj version
   1.0.0 will support Python versions >= 3.6.
 
-0.7.0 (2010-10-21)
+0.7.0 (2020-10-21)
 ------------------
 
 - Warn about deprecation of support for Python versions < 3.7 in 1.0.0 (#33).
