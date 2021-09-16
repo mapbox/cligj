@@ -1,8 +1,8 @@
 cligj
 ======
 
-.. image:: https://travis-ci.com/mapbox/cligj.svg
-   :target: https://travis-ci.com/mapbox/cligj
+.. image:: https://app.travis-ci.com/mapbox/cligj.svg?branch=master
+    :target: https://app.travis-ci.com/mapbox/cligj
 
 .. image:: https://coveralls.io/repos/mapbox/cligj/badge.png?branch=master
    :target: https://coveralls.io/r/mapbox/cligj?branch=master
