@@ -5,7 +5,7 @@ python:
   - "3.7"
   - "3.8"
 install:
-  - "pip install coveralls"
+  - "pip install coveralls==3.2.0"
   - "pip install -e .[test]"
 script: 
   - py.test --cov cligj --cov-report term-missing
