@@ -132,6 +132,13 @@ def test_geometrypretty(expected_features):
     features = normalize_feature_inputs(None, 'features', ["tests/point_pretty_geom.txt"])
     assert _geoms(features)[0] == _geoms(expected_features)[0]
 
+
+def test_invalid_type():
+    features = normalize_feature_inputs(None, 'features', ["tests/twopoints_invalid_type.txt"])
+    with pytest.raises(TypeError):
+        _geoms(features)
+
+
 class MockGeo(object):
     def __init__(self, feature):
         self.__geo_interface__ = feature
@@ -148,6 +155,7 @@ def test_normalize_feature_objects_bad(expected_features):
     objs.append(MockGeo(dict()))
     with pytest.raises(ValueError):
         list(normalize_feature_objects(objs))
+
 
 def test_to_feature(expected_features):
     geom = expected_features[0]['geometry']
