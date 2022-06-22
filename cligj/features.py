@@ -126,7 +126,7 @@ def iter_features(geojsonfile, func=None):
                     if newfeat:
                         yield newfeat
             else:
-                raise TypeError("Type must be Feature or FeatureCollection")
+                raise TypeError("Invalid type")
 
         # Indented or pretty-printed GeoJSON features or feature
         # collections will fail out of the try clause above since
