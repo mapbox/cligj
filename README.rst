@@ -1,6 +1,10 @@
 cligj
 ======
 
+.. image:: https://github.com/mapbox/cligj/actions/workflows/python-package.yml/badge.svg
+   :alt: Python Workflow
+   :target: https://github.com/mapbox/cligj/actions/workflows/python-package.yml
+   
 .. image:: https://app.travis-ci.com/mapbox/cligj.svg?branch=master
     :target: https://app.travis-ci.com/mapbox/cligj
 
