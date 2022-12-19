@@ -2,10 +2,10 @@ sudo: false
 language: python
 python:
   - "3.6"
-  - "3.7"
   - "3.8"
+  - "3.9"
 install:
-  - "pip install coveralls==3.2.0"
+  - "pip install python-coveralls"
   - "pip install -e .[test]"
 script: 
   - py.test --cov cligj --cov-report term-missing

@@ -15,7 +15,7 @@ with codecs_open('README.rst', encoding='utf-8') as f:
 setup(
     name="cligj",
     version=version,
-    description=u"Click params for commmand line interfaces to GeoJSON",
+    description=u"Click params for command line interfaces to GeoJSON",
     long_description=long_description,
     classifiers=[],
     keywords="",
